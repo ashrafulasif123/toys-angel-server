@@ -11,9 +11,6 @@ app.use(express.json())
 
 // -------------------
 // MONGODB DATABASE
-//toysangelDB
-//JM355moLcaJWGOe1
-
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.baw8kky.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -30,6 +27,15 @@ async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
+        const toyCollection = client.db("toysDB").collection("toys");
+        
+        // Add a toy
+        app.post('/toys', async(req, res) =>{
+            const toy = req.body;
+            const result = await toyCollection.insertOne(toy);
+            res.send(result)
+        })
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -44,7 +50,7 @@ run().catch(console.dir);
 
 
 
-//
+//---------------------
 app.get('/', (req, res) => {
     res.send('AngelToys Market is Running')
 })
