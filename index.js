@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
@@ -29,25 +29,39 @@ async function run() {
         await client.connect();
         const toyCollection = client.db("toysDB").collection("toys");
         // Sub-Category
-        app.get('/toys', async(req, res) =>{
+        app.get('/toys', async (req, res) => {
             let query = {}
-            if(req.query.subCategory){
-                query= {subCategory: req.query.subCategory}
+            if (req.query.subCategory) {
+                query = { subCategory: req.query.subCategory }
+            }
+            const result = await toyCollection.find(query).toArray();
+            res.send(result)
+        })
+        //Seller Email
+        app.get('/mytoys', async (req, res) => {
+            let query = {}
+            if (req.query.sellerEmail) {
+                query = { sellerEmail: req.query.sellerEmail }
             }
             const result = await toyCollection.find(query).toArray();
             res.send(result)
         })
         // All Toys
-        app.get('/toys', async(req, res) =>{
+        app.get('/toys', async (req, res) => {
             const result = toyCollection.find().toArray();
             res.send(result)
         })
-
-
         // Add a toy
-        app.post('/toys', async(req, res) =>{
+        app.post('/toys', async (req, res) => {
             const toy = req.body;
             const result = await toyCollection.insertOne(toy);
+            res.send(result)
+        })
+        // Delete My Toys
+        app.delete('/toys/:id', async(req, res) =>{
+            const id = req.params.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await toyCollection.deleteOne(query)
             res.send(result)
         })
 
