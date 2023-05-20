@@ -64,6 +64,29 @@ async function run() {
             const result = await toyCollection.deleteOne(query)
             res.send(result)
         })
+        // Update Toy
+        app.get('/toys/:id', async(req, res) =>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await toyCollection.findOne(query)
+            res.send(result)
+        })
+        app.put('/toys/:id', async(req, res) =>{
+            const id = req.params.id;
+            const filter = {_id : new ObjectId(id)}
+            const options = { upsert: true };
+            const updateToy = req.body;
+            console.log(id, updateToy)
+            const toy = {
+                $set : {
+                    price : updateToy.price,
+                    quantity : updateToy.quantity,
+                    description : updateToy.description
+                }
+            }
+            const result = await toyCollection.updateOne(filter, toy, options); 
+            res.send(result)
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
