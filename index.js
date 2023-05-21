@@ -26,7 +26,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
         const toyCollection = client.db("toysDB").collection("toys");
         // Sub-Category
         app.get('/toys', async (req, res) => {
@@ -42,6 +42,15 @@ async function run() {
             let query = {}
             if (req.query.sellerEmail) {
                 query = { sellerEmail: req.query.sellerEmail }
+            }
+            const result = await toyCollection.find(query).toArray();
+            res.send(result)
+        })
+        // search toy name
+        app.get('/toyname', async(req, res) =>{
+            let query = {}
+            if (req.query.name) {
+                query = { name: req.query.name }
             }
             const result = await toyCollection.find(query).toArray();
             res.send(result)
@@ -66,6 +75,12 @@ async function run() {
         })
         // Update Toy
         app.get('/toys/:id', async(req, res) =>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await toyCollection.findOne(query)
+            res.send(result)
+        })
+        app.get('/singletoy/:id', async(req, res) =>{
             const id = req.params.id;
             const query = {_id: new ObjectId(id)}
             const result = await toyCollection.findOne(query)
